@@ -1,0 +1,41 @@
+---
+## Deploys VMware Suite Life Cycle Manager
+- hosts: vrlcm_appliances
+  become: no
+  gather_facts: False
+  vars:
+    vrlcm_deployment_vcenter_hostname: "{{ cmp_vcenter_hostname }}"
+    vrlcm_deployment_vcenter_username: "{{ cmp_vcenter_username }}"
+    vrlcm_deployment_vcenter_password: "{{ cmp_vcenter_password }}"
+    vrlcm_deployment_vcenter_datacenter: "SG1"
+    vrlcm_deployment_vcenter_cluster: "SG1-CLS-MGMT-01"
+    vrlcm_deployment_vcenter_datastore: "vsanDatastore"
+    vrlcm_deployment_network: "Management"
+    vrlcm_deployment_network_ip_address: "10.1.10.78"
+    vrlcm_deployment_network_netmask: "255.255.255.0"
+    vrlcm_deployment_network_gateway: "10.1.10.254"
+
+    vrlcm_datacenters:
+      - name: "{{ vrlcm_deployment_vcenter_datacenter }}"
+        city: "Caerphilly, Wales, GB"
+        state: "Caerphilly"
+        country: "UK"
+
+    vrlcm_vcenter_servers:
+      - hostname: "{{ vrlcm_deployment_vcenter_hostname }}"
+        datacenter: "{{ vrlcm_deployment_vcenter_datacenter }}"
+        username: "{{ vrlcm_endpoint_vcenter_username }}"
+        password: "{{ vrlcm_endpoint_vcenter_password }}"
+        type: 3
+
+  roles:
+    - vrlcm_deploy_ova
+    - vrlcm_change_default_password
+    - vrlcm_configure_ssh
+    - vrlcm_disable_welcome_tour
+    - vrlcm_configure_telemetry
+    - vrlcm_create_datacenter
+    - vrlcm_add_vcenter_server
+    - vrlcm_add_vidm
+    - vrlcm_add_active_directory
+    - vrlcm_add_myvmware

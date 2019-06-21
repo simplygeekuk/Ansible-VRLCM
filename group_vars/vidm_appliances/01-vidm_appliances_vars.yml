@@ -1,0 +1,14 @@
+---
+# vIDM API Variables
+vidm_api_version: "1"
+
+# vIDM OVF/OVA Variables
+vidm_ova_path: "/mnt/iso/VMware/vIDM/3.3"
+vidm_ova_filename: "identity-manager-3.3.0.0-10084102_OVF10.ova"
+
+# vRLCM Default Deployment Variables
+vidm_deployment_disk_type: "thin"
+
+# vRLCM Misc Variables
+vidm_telemetry_enabled: false
+vidm_timezone: "Europe/London"

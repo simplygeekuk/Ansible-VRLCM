@@ -1,0 +1,23 @@
+---
+# tasks file for roles/vrlcm_deploy_vra_iaas_servers
+
+- name: Disable UAC through Registry
+  win_regedit:
+    path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System
+    name: EnableLUA
+    data: 0
+    type: dword
+  register: uac_disabled
+
+- name: Disable IPv6 through Registry
+  win_regedit:
+    path: HKLM:\System\CurrentControlSet\Services\TCPIP6\Parameters
+    name: DisabledComponents
+    data: 0xff
+    type: dword
+  register: ipv6_disabled
+
+- name: Reboot Machine To Apply Changes
+  win_reboot:
+    connect_timeout: 10
+  when: uac_disabled.changed or ipv6_disabled.changed

@@ -1,0 +1,14 @@
+---
+# tasks file for roles/vrlcm_deploy_vra_iaas_servers
+
+- name: Deploy vRA IaaS VMs
+  include: vra_deploy_iaas_server.yml
+
+- name: Configure vRA Service Account
+  include: configure_service_account.yml
+
+- name: Disable User Account Control & IPv6
+  include: disable_uac_ipv6.yml
+
+- name: Re-install and Configure MSDTC
+  include: reinstall_msdtc.yml

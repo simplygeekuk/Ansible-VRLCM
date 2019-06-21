@@ -1,0 +1,107 @@
+---
+# tasks file for roles/vrlcm_deploy_vra_iaas_servers
+
+- name: Configure LuTransactions
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: LuTransactions
+    data: 1
+    type: dword
+  register: LuTransactions_configured
+
+- name: Configure NetworkDtcAccess
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcAccess
+    data: 1
+    type: dword
+  register: NetworkDtcAccess_configured
+
+- name: Configure NetworkDtcAccessInbound
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcAccessInbound
+    data: 1
+    type: dword
+  register: NetworkDtcAccessInbound_configured
+
+- name: Configure NetworkDtcAccessOutbound
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcAccessOutbound
+    data: 1
+    type: dword
+  register: NetworkDtcAccessOutbound_configured
+
+- name: Configure NetworkDtcClients
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcClients
+    data: 1
+    type: dword
+  register: NetworkDtcClients_configured
+
+- name: Configure NetworkDtcAccessTransactions
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcAccessTransactions
+    data: 1
+    type: dword
+  register: NetworkDtcAccessTransactions_configured
+
+- name: Configure NetworkDtcAccessAdmin
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcAccessAdmin
+    data: 1
+    type: dword
+  register: NetworkDtcAccessAdmin_configured
+
+- name: Configure NetworkDtcAccessClients
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC\Security
+    name: NetworkDtcAccessClients
+    data: 1
+    type: dword
+  register: NetworkDtcAccessClients_configured
+
+- name: Configure AllowOnlySecureRpcCalls
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC
+    name: AllowOnlySecureRpcCalls
+    data: 1
+    type: dword
+  register: AllowOnlySecureRpcCalls_configured
+
+- name: Configure FallbackToUnsecureRPCIfNecessary
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC
+    name: FallbackToUnsecureRPCIfNecessary
+    data: 0
+    type: dword
+  register: FallbackToUnsecureRPCIfNecessary_configured
+
+- name: Configure TurnOffRpcSecurity
+  win_regedit:
+    path: HKLM:\Software\Microsoft\MSDTC
+    name: TurnOffRpcSecurity
+    data: 0
+    type: dword
+  register: TurnOffRpcSecurity_configured
+
+- name: Restart MSDTC Service
+  win_service:
+    name: Distributed Transaction Coordinator
+    state: restarted
+  when: >
+    LuTransactions_configured.changed|bool or
+    NetworkDtcAccess_configured.changed|bool or
+    NetworkDtcAccessInbound_configured.changed|bool or
+    NetworkDtcAccessOutbound_configured.changed|bool or
+    NetworkDtcClients_configured.changed|bool or
+    NetworkDtcAccessTransactions_configured.changed|bool or
+    NetworkDtcAccessAdmin_configured.changed|bool or
+    NetworkDtcAccessClients_configured.changed|bool or
+    AllowOnlySecureRpcCalls_configured.changed|bool or
+    FallbackToUnsecureRPCIfNecessary_configured.changed|bool or
+    TurnOffRpcSecurity_configured.changed|bool

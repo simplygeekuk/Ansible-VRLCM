@@ -1,0 +1,61 @@
+---
+# tasks file for roles/vrlcm_deploy_vra_iaas_servers
+
+- name: Set Hardware CPU
+  set_fact:
+    vra_iaas_hardware_cpu: "{{ item.cpu }}"
+  loop: "{{ vra_iaas_hw_spec }}"
+  when: item.role == iaas_role
+
+- name: Set Hardware Memory
+  set_fact:
+    vra_iaas_hardware_mem: "{{ item.mem * 1024 }}"
+  loop: "{{ vra_iaas_hw_spec }}"
+  when: item.role == iaas_role
+
+- name: "Deploy vRA IaaS machine '{{ inventory_hostname_short }}' with role '{{ iaas_role }}'"
+  vmware_guest:
+    hostname: "{{ vra_iaas_deployment_vcenter_hostname }}"
+    username: "{{ vra_iaas_deployment_vcenter_username }}"
+    password: "{{ vra_iaas_deployment_vcenter_password }}"
+    validate_certs: "{{ ova_validate_certs }}"
+    datacenter: "{{ vra_iaas_deployment_vcenter_datacenter }}"
+    cluster: "{{ vra_iaas_deployment_vcenter_cluster }}"
+    folder: "{{ vra_iaas_deployment_vcenter_folder | default('/') }}"
+    datastore: "{{ vra_iaas_deployment_vcenter_datastore }}"
+    name: "{{ inventory_hostname_short|upper }}"
+    template: "{{ vra_iaas_deployment_vcenter_template }}"
+    linked_clone: yes
+    snapshot_src: "Template"
+    networks:
+    - name: "{{ net_label }}"
+      type: static
+      ip: "{{ net_ip }}"
+      netmask: "{{ net_mask }}"
+      gateway: "{{ net_gateway }}"
+      domain: "{{ dns_default_domain }}"
+      dns_servers:
+      - "{{ dns_server_1 }}"
+      # - "{{ dns_server_2 }}"
+    hardware:
+      memory_mb: "{{ vra_iaas_hardware_mem }}"
+      num_cpus: "{{ vra_iaas_hardware_cpu }}"
+    # customization_spec: "{{ vra_iaas_custom_spec }}"
+    customization:
+      hostname: "{{ inventory_hostname_short|lower }}"
+      autologon: no
+      dns_servers:
+      - "{{ dns_server_1 }}"
+      # - "{{ dns_server_2 }}"
+      timezone: "{{ win_timezone }}"
+      domain: "{{ dns_default_domain }}"
+      password: "{{ win_admin_password }}"
+      joindomain: "{{ dns_default_domain }}"
+      domainadmin: "{{ ad_dom_join_username }}"
+      domainadminpassword: "{{ ad_dom_join_password }}"
+      runonce:
+      - powershell.exe -ExecutionPolicy Unrestricted -File C:\Build\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
+    wait_for_customization: yes
+    wait_for_ip_address: yes
+    state: poweredon
+  delegate_to: localhost

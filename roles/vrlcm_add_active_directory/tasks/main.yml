@@ -1,0 +1,43 @@
+---
+# tasks file for roles/vrlcm_add_active_directory
+
+- name: Include Request API Authorization Token if not defined
+  include_role:
+    name: vrlcm_get_auth_token
+  when: vrlcm_api_auth_token is not defined or vrlcm_api_auth_token == ""
+
+- name: Add Active Directory
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/settings/ad/add"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200]
+    body_format: "{{ http_body_format }}"
+    body:
+      adName: "{{ vrlcm_ad_domain }}"
+      baseDN: "{{ vrlcm_ad_base_dn }}"
+      bindDN: "{{ vrlcm_ad_bind_dn }}"
+      groupDN: "{{ vrlcm_ad_group_dn }}"
+      userDN: "{{ vrlcm_ad_user_dn }}"
+      bindPassword: "{{ vrlcm_ad_bind_password }}"
+      uberAdmin: "{{ vrlcm_ad_admin_users }}"
+      syncNestedGroupMembers: yes
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  changed_when: response.status == 200
+  #no_log: true
+
+- name: Get Request ID
+  set_fact:
+    requestId: "{{ response.json.requestId }}"
+  when: response.status == 200
+
+- name: Wait for Active Directory Task to Complete
+  include_role:
+    name: vrlcm_wait_for_request
+  when: response.status == 200

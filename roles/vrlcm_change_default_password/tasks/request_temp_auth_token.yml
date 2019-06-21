@@ -1,0 +1,26 @@
+---
+# tasks file for vrlcm_change_default_password
+
+- name: Request Temporary Authorization Token
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/login"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200, 500]
+    body_format: "{{ http_body_format }}"
+    body:
+      username: "{{ vrlcm_gui_username }}"
+      password: "{{ vrlcm_gui_default_password }}"
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  changed_when: response.status == 200
+  no_log: true
+
+- name: Set API Authorization Token
+  set_fact:
+    vrlcm_api_auth_token: "{{ response.json.token }}"
+  when: response.status == 200

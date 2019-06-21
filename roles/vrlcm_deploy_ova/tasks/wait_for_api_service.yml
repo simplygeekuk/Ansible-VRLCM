@@ -1,0 +1,23 @@
+---
+# tasks file for roles/vrlcm_deploy_ova
+
+- name: Wait for API to Service Authorization Requests
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/login"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200, 403, 500]
+    body_format: "{{ http_body_format }}"
+    body:
+      username: "{{ vrlcm_gui_username }}"
+      password: "{{ vrlcm_gui_default_password }}"
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  no_log: true
+  until: response.status == 200
+  retries: 20
+  delay: 10

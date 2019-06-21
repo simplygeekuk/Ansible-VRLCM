@@ -1,0 +1,17 @@
+---
+# vCenter Template and Customization
+vra_iaas_deployment_vcenter_template: VRA-IAAS-WIN2016
+vra_iaas_custom_spec: vRA-IaaS-Custom-Spec
+
+vra_service_account: svc_vra@sgroot.local
+
+# Ansible Windows User
+ansible_user: "{{ win_admin_username }}"
+ansible_password: "{{ win_admin_password }}"
+# ansible_winrm_transport: kerberos
+
+# ansible_port: '5985'
+ansible_port: '5986'
+ansible_connection: winrm
+ansible_winrm_transport: credssp
+ansible_winrm_server_cert_validation: ignore

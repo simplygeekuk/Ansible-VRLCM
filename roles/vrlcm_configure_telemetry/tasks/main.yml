@@ -1,0 +1,26 @@
+---
+# tasks file for roles/vrlcm_configure_telemetry
+
+- name: Include Request API Authorization Token if not defined
+  include_role:
+    name: vrlcm_get_auth_token
+  when: vrlcm_api_auth_token is not defined or vrlcm_api_auth_token == ""
+
+- name: Configure Telemetry
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/settings"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200]
+    body_format: "{{ http_body_format }}"
+    body:
+      telemetryEnabled: "{{ vrlcm_telemetry_enabled }}"
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  changed_when: response.status == 200
+  no_log: true

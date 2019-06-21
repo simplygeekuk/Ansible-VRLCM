@@ -1,0 +1,8 @@
+---
+## Deploys a vRA environment using LCM
+- hosts: vra_iaas_servers
+  connection: local
+  become: no
+  gather_facts: False
+  roles:
+    - vrlcm_deploy_vra_iaas_servers

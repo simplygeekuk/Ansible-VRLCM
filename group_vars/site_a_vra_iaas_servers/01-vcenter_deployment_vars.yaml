@@ -1,0 +1,6 @@
+---
+# vCenter Deployment Variables
+vra_iaas_deployment_vcenter_hostname: "{{ cmp_vcenter_hostname }}"
+vra_iaas_deployment_vcenter_datacenter: "SG1"
+vra_iaas_deployment_vcenter_cluster: "SG1-CLS-MGMT-01"
+vra_iaas_deployment_vcenter_datastore: "vsanDatastore"

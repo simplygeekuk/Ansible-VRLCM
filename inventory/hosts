@@ -1,0 +1,62 @@
+[local]
+localhost   ansible_python_interpreter=~/python-env/ansible_vrlcm/bin/python
+
+####################
+# Host Definitions #
+####################
+# Site A
+[site_a_vrlcm_appliances]
+sg1-lcm002.sgroot.local     ansible_user=root
+
+[site_a_vra_appliances]
+sg1-vra003.sgroot.local
+
+[site_a_vra_iaas_servers]
+sg1-vrm003.sgroot.local     net_label="Management"  net_ip="10.1.10.180"  net_mask="255.255.255.0"  net_gateway="10.1.10.254"   iaas_role="core"
+
+[site_a_vidm_appliances]
+sg1-idm002.sgroot.local
+
+# Site B
+[site_b_vrlcm_appliances]
+
+
+[site_b_vra_appliances]
+
+
+[site_b_vra_iaas_servers]
+
+
+[site_b_vidm_appliances]
+
+
+##########################
+# Host Group Definitions #
+##########################
+[site_a:children]
+site_a_vrlcm_appliances
+site_a_vra_appliances
+site_a_vra_iaas_servers
+site_a_vidm_appliances
+
+[site_b:children]
+site_b_vrlcm_appliances
+site_b_vra_appliances
+site_b_vra_iaas_servers
+site_b_vidm_appliances
+
+[vrlcm_appliances:children]
+site_a_vrlcm_appliances
+site_b_vrlcm_appliances
+
+[vra_appliances:children]
+site_a_vra_appliances
+site_b_vra_appliances
+
+[vra_iaas_servers:children]
+site_a_vra_iaas_servers
+site_b_vra_iaas_servers
+
+[vidm_appliances:children]
+site_a_vidm_appliances
+site_b_vidm_appliances

@@ -1,0 +1,18 @@
+---
+# Default vRA IaaS Hardware Specifications by Role
+vra_iaas_hw_spec:
+  - role: core
+    cpu: 4
+    mem: 8
+  - role: web
+    cpu: 2
+    mem: 8
+  - role: manager
+    cpu: 2
+    mem: 8
+  - role: dem
+    cpu: 2
+    mem: 8
+  - role: agent
+    cpu: 2
+    mem: 8

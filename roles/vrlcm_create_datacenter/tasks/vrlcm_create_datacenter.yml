@@ -1,0 +1,33 @@
+---
+# tasks file for roles/vrlcm_create_datacenter
+
+- name: Check Datacenter exists.
+  include: check_datacenter_exists.yml
+
+- name: Create Datacenter
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/action/create/datacenter"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200]
+    body_format: "{{ http_body_format }}"
+    body:
+      datacenterName: "{{ datacenter.name }}"
+      city: "{{ datacenter.city }}"
+      country: "{{ datacenter.country }}"
+      state: "{{ datacenter.state }}"
+      latitude: "{{ datacenter.latitude | default(omit) }}"
+      longitude: "{{ datacenter.longitude | default(omit) }}"
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  when: datacenter_id is not defined or datacenter_id == ""
+  changed_when: response.status == 200
+
+- name: Unset datacenter_id
+  set_fact:
+    datacenter_id: ""

@@ -1,0 +1,28 @@
+---
+# tasks file for vrlcm_change_default_password
+
+- name: Include Request Temporary Authorization Token
+  include: request_temp_auth_token.yml
+
+- name: Change Default Admin Password
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/settings"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200]
+    body_format: "{{ http_body_format }}"
+    body:
+      adminPassword: "{{ vrlcm_gui_password }}"
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: True
+  when: vrlcm_api_auth_token is defined
+  no_log: true
+
+- name: Include Remove Temporary Authorization Token
+  include: remove_temp_auth_token.yml
+  when: vrlcm_api_auth_token is defined

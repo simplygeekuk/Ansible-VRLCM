@@ -1,0 +1,4 @@
+---
+# vCenter Deployment Credentials
+vra_iaas_deployment_vcenter_username: "{{ cmp_vcenter_username }}"
+vra_iaas_deployment_vcenter_password: "{{ cmp_vcenter_password }}"

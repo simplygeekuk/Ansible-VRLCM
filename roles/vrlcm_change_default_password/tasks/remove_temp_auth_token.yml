@@ -1,0 +1,20 @@
+---
+# tasks file for vrlcm_change_default_password
+
+- name: Remove Temporary Authorization Token
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/logout"
+    method: POST
+    headers:
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200]
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  changed_when: response.status == 200
+
+- name: Set API Authorization Token
+  set_fact:
+    vrlcm_api_auth_token: ""

@@ -1,0 +1,7 @@
+---
+## NTP Servers
+ntp_server_default: pool.ntp.org
+ntp_server_1: 0.pool.ntp.org
+ntp_server_2: 1.pool.ntp.org
+ntp_server_3: 2.pool.ntp.org
+ntp_server_4: 3.pool.ntp.org

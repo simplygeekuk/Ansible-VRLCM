@@ -1,0 +1,24 @@
+---
+# tasks file for roles/vrlcm_disable_welcome_tour
+
+- name: Set SSH Password
+  set_fact:
+     ansible_ssh_pass: "{{ vrlcm_root_password }}"
+  when: ssh_password_changed is defined
+
+- name: Set SSH Password
+  set_fact:
+     ansible_ssh_pass: "{{ vrlcm_gui_default_password }}"
+  when: ssh_password_changed is undefined
+
+- name: Set defaultPasswordUpdated to true
+  replace:
+    path: /opt/vmware/vlcm/config/ui-config.json
+    regexp: '^\s+\"defaultPasswordUpdated\": false,'
+    replace: '  "defaultPasswordUpdated": true,'
+
+- name: Set productTourCompleted to true
+  replace:
+    path: /opt/vmware/vlcm/config/ui-config.json
+    regexp: '^\s+\"productTourCompleted\": false'
+    replace: '  "productTourCompleted": true'

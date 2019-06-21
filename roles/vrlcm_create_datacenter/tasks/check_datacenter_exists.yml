@@ -1,0 +1,30 @@
+---
+# tasks file for roles/vrlcm_create_datacenter
+
+- name: Include Request API Authorization Token if not defined
+  include_role:
+    name: vrlcm_get_auth_token
+  when: vrlcm_api_auth_token is not defined
+
+- name: Get Existing Datacenters
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/view/datacenter"
+    method: GET
+    headers:
+      Accept: "{{ http_Accept }}"
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200]
+  register: datacenters
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  changed_when: false
+
+- name: Check if Datacenter already exists
+  set_fact:
+    datacenter_id: "{{ datacenters | json_query(query) | first }}"
+  vars:
+    query: "json[?name=='{{ datacenter.name }}'].id"
+  ignore_errors: true
+  changed_when: false

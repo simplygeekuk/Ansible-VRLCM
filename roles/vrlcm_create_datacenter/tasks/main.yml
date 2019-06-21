@@ -1,0 +1,13 @@
+---
+# tasks file for roles/vrlcm_create_datacenter
+
+- name: Include Request API Authorization Token if not defined
+  include_role:
+    name: vrlcm_get_auth_token
+  when: vrlcm_api_auth_token is not defined or vrlcm_api_auth_token == ""
+  
+- name: Create Datacenter
+  include: vrlcm_create_datacenter.yml
+  loop: "{{ vrlcm_datacenters }}"
+  loop_control:
+    loop_var: datacenter

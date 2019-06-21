@@ -1,0 +1,51 @@
+---
+# tasks file for roles/vrlcm_deploy_ova
+
+- name: Determine vRLCM Deployment Size
+  set_fact:
+    vrlcm_deployment_size: "medium"
+  when: vrlcm_content_management_enabled|bool
+
+- name: Deploy vRealize Life Cycle Manager OVA
+  vmware_deploy_ovf:
+    hostname: "{{ vrlcm_deployment_vcenter_hostname }}"
+    username: "{{ vrlcm_deployment_vcenter_username }}"
+    password: "{{ vrlcm_deployment_vcenter_password }}"
+    validate_certs: '{{ ova_validate_certs }}'
+    name: "{{ inventory_hostname_short |upper }}"
+    folder: "{{ vrlcm_deployment_vcenter_folder | default(omit) }}"
+    datacenter: "{{ vrlcm_deployment_vcenter_datacenter }}"
+    cluster: "{{ vrlcm_deployment_vcenter_cluster }}"
+    resource_pool: "{{ vrlcm_deployment_vcenter_resource_pool | default(omit) }}"
+    datastore: "{{ vrlcm_deployment_vcenter_datastore }}"
+    disk_provisioning: "{{ vrlcm_deployment_disk_type }}"
+    networks: 
+      "Network 1": "{{ vrlcm_deployment_network }}"
+    ova: "{{ vrlcm_ova_path }}/{{ vrlcm_ova_filename }}"
+    allow_duplicates: no
+    power_on: yes
+    deployment_option: "{{ vrlcm_deployment_size | default('small') }}"
+    fail_on_spec_warnings: yes
+    wait: yes
+    wait_for_ip_address: yes
+    properties:
+      vami.hostname: "{{ inventory_hostname |lower }}"
+      vami.ip0.VMware_vRealize_Suite_LCM_Appliance: "{{ vrlcm_deployment_network_ip_address }}"
+      vami.netmask0.VMware_vRealize_Suite_LCM_Appliance: "{{ vrlcm_deployment_network_netmask }}"
+      vami.gateway.VMware_vRealize_Suite_LCM_Appliance: "{{ vrlcm_deployment_network_gateway }}"
+      vami.DNS.VMware_vRealize_Suite_LCM_Appliance: "{{ dns_server_1 }}"
+      vami.domain.VMware_vRealize_Suite_LCM_Appliance: "{{ dns_default_domain }}"
+      vami.searchpath.VMware_vRealize_Suite_LCM_Appliance: "{{ dns_default_domain }}"
+      va-ntp-servers: "{{ ntp_server_default }}"
+      va-telemetry-enabled: "{{ vrlcm_telemetry_enabled }}"
+      vlcm.cert.commonname: "{{ vrlcm_cert_commonname }}"
+      vlcm.cert.countrycode: "{{ vrlcm_cert_countrycode }}"
+      vlcm.cert.orgname: "{{ vrlcm_cert_orgname }}"
+      vlcm.cert.orgunit: "{{ vrlcm_cert_orgunit }}"
+    inject_ovf_env: yes
+  delegate_to: localhost
+  register: ovf_deployed
+
+- name: Include Wait for API Service to Start
+  include: wait_for_api_service.yml
+  when: ovf_deployed.changed|bool

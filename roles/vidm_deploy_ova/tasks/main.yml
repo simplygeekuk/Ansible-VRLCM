@@ -1,0 +1,37 @@
+---
+# tasks file for roles/vidm_deploy_ova
+
+- name: Deploy VMware Identity Manager OVA
+  vmware_deploy_ovf:
+    hostname: "{{ vidm_deployment_vcenter_hostname }}"
+    username: "{{ vidm_deployment_vcenter_username }}"
+    password: "{{ vidm_deployment_vcenter_password }}"
+    validate_certs: '{{ ova_validate_certs }}'
+    name: "{{ inventory_hostname_short |upper }}"
+    folder: "{{ vidm_deployment_vcenter_folder | default(omit) }}"
+    datacenter: "{{ vidm_deployment_vcenter_datacenter }}"
+    cluster: "{{ vidm_deployment_vcenter_cluster }}"
+    resource_pool: "{{ vidm_deployment_vcenter_resource_pool | default(omit) }}"
+    datastore: "{{ vidm_deployment_vcenter_datastore }}"
+    disk_provisioning: "{{ vidm_deployment_disk_type }}"
+    networks: 
+      "Network 1": "{{ vidm_deployment_network }}"
+    ova: "{{ vidm_ova_path }}/{{ vidm_ova_filename }}"
+    allow_duplicates: no
+    power_on: yes
+    fail_on_spec_warnings: yes
+    wait: yes
+    wait_for_ip_address: yes
+    properties:
+      vami.hostname: "{{ inventory_hostname |lower }}"
+      vami.ip0.IdentityManager: "{{ vidm_deployment_network_ip_address }}"
+      vami.netmask0.IdentityManager: "{{ vidm_deployment_network_netmask }}"
+      vami.gateway.IdentityManager: "{{ vidm_deployment_network_gateway }}"
+      vami.DNS.IdentityManager: "{{ dns_server_1 }}"
+      vami.domain.IdentityManager: "{{ dns_default_domain }}"
+      vami.searchpath.IdentityManager: "{{ dns_default_domain }}"
+      ceip.enabled: "{{ vidm_telemetry_enabled }}"
+      vamitimezone: "{{ vidm_timezone }}"
+    inject_ovf_env: yes
+  delegate_to: localhost
+  register: ovf_deployed

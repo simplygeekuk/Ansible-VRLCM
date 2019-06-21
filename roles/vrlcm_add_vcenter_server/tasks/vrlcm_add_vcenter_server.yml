@@ -1,0 +1,35 @@
+---
+# tasks file for roles/vrlcm_add_vcenter_server
+
+- name: Add vCenter Server
+  uri:
+    url: "https://{{ inventory_hostname |lower }}/lcm/api/v{{ vrlcm_api_version }}/action/add/vc"
+    method: POST
+    headers:
+      Accept: "{{ http_Accept }}"
+      x-xenon-auth-token: "{{ vrlcm_api_auth_token }}"
+    validate_certs: "{{ http_validate_certs }}"
+    status_code: [200, 400]
+    body_format: "{{ http_body_format }}"
+    body:
+      datacenterName: "{{ vcenter.datacenter }}"
+      vCenterName: "{{ vcenter.hostname }}"
+      userName: "{{ vcenter.username }}"
+      password: "{{ vcenter.password }}"
+      type: "{{ vcenter.type }}"
+  register: response
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  changed_when: response.status == 200
+  no_log: true
+
+- name: Get Request ID
+  set_fact:
+    requestId: "{{ response.json.id }}"
+  when: response.status == 200
+
+- name: Wait for vCenter Server Inventory Collection to Complete
+  include_role:
+    name: vrlcm_wait_for_request
+  when: response.status == 200

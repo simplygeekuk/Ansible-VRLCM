@@ -1,0 +1,33 @@
+---
+# vRLCM API Variables
+vrlcm_api_version: "1"
+
+# vRLCM OVF/OVA Variables
+vrlcm_ova_path: "/mnt/iso/VMware/LCM/2.1"
+vrlcm_ova_filename: "VMware-vLCM-Appliance-2.1.0.11-13273278_OVF10.ova"
+
+# vRLCM Default Deployment Variables
+vrlcm_content_management_enabled: yes
+vrlcm_deployment_disk_type: "thin"
+
+# vRLCM Misc Variables
+vrlcm_ssh_enabled: true
+vrlcm_validate_certs: no
+vrlcm_telemetry_enabled: false
+
+# vRLCM Certificate Variables
+vrlcm_cert_commonname: ""
+vrlcm_cert_countrycode: "UK"
+vrlcm_cert_orgname: "simplygeek"
+vrlcm_cert_orgunit: "simplygeek"
+
+# vIDM
+vidm_hostname: sg1-idm001.sgroot.local
+
+# Active Directory
+vrlcm_ad_domain: "sgroot.local"
+vrlcm_ad_base_dn: "DC=sgroot,DC=local"
+vrlcm_ad_bind_dn: "CN=svc_lcm_bind,OU=Service_Accounts,OU=Users,OU=SG,DC=sgroot,DC=local"
+vrlcm_ad_group_dn: "OU=lcm,OU=Groups,OU=SG,DC=sgroot,DC=local"
+vrlcm_ad_user_dn: "OU=Admins,OU=Users,OU=SG,DC=sgroot,DC=local"
+vrlcm_ad_admin_users: "svc_lcm_bind@sgroot.local"

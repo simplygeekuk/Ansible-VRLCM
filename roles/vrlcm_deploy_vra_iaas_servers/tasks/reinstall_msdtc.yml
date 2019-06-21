@@ -1,0 +1,41 @@
+---
+# tasks file for roles/vrlcm_deploy_vra_iaas_servers
+
+- name: Check if MSDTC Service is Installed
+  win_service:
+    name: Distributed Transaction Coordinator
+  register: msdtc_service_info
+
+- name: Uninstall MSDTC
+  win_command: MSDTC -uninstall
+  register: msdtc_uninstall
+  when: msdtc_service_info.exists|bool
+
+- name: debug msdtc uninstall
+  debug:
+    var: msdtc_uninstall
+
+- name: Install MSDTC
+  win_command: MSDTC -install
+  register: msdtc_install
+
+- name: Check if MSDTC Service is Installed
+  win_service:
+    name: Distributed Transaction Coordinator
+  register: msdtc_service_info
+  until: msdtc_service_info.exists|bool
+  retries: 5
+  delay: 10
+
+- name: Set MSDTC Service to Automatic
+  win_service:
+    name: Distributed Transaction Coordinator
+    start_mode: auto
+
+- name: Start MSDTC Service
+  win_service:
+    name: Distributed Transaction Coordinator
+    state: started
+
+- name: Apply MSDTC Configuration
+  include: configure_msdtc.yml
